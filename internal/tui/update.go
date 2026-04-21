@@ -76,7 +76,7 @@ func (m Model) handleNav(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.state.Feed()
 	case "p":
 		m.state.Play()
-	case "t":
+	case "a":
 		m.chatMode = true
 	case "k":
 		m.scrollOffset++
