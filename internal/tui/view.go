@@ -22,7 +22,7 @@ var (
 	barFill     = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	barEmpty    = lipgloss.NewStyle().Foreground(lipgloss.Color("237"))
 	chatStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
-	youStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("39"))
+	youStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 	petStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	actionStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Italic(true)
 	tsStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("238"))
