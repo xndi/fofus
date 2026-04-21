@@ -98,9 +98,9 @@ func (m Model) buildLeftParts() (top []string, foot []string) {
 	top = append(top, "")
 	top = append(top, dimStyle.Render(strings.Repeat("─", leftWidth)))
 	top = append(top,
-		statBar("♥", "hunger", m.state.Hunger),
-		statBar("★", "happy ", m.state.Happiness),
-		statBar("⚡", "energy", m.state.Energy),
+		statBar("♡", "hunger", m.state.Hunger),
+		statBar("☺", "happy ", m.state.Happiness),
+		statBar("♦", "energy", m.state.Energy),
 	)
 
 	foot = []string{
