@@ -105,8 +105,8 @@ func (m Model) buildLeftParts() (top []string, foot []string) {
 
 	foot = []string{
 		dimStyle.Render(strings.Repeat("─", leftWidth)),
-		hintStyle.Render("f  feed   p  play"),
-		hintStyle.Render("i  chat   q  quit"),
+		kh("f", "eed") + "  " + kh("p", "lay") + "  " + kh("t", "alk") + "  " + kh("q", "uit"),
+		"",
 	}
 	return
 }
@@ -204,15 +204,21 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 		foot = append(foot, inputStyle.Render("> "+m.input+"█"))
 		foot = append(foot, hintStyle.Render("/smart  smarter reply · esc  cancel"))
 	} else {
-		scrollHint := "i  chat   j/k  scroll   c  copy"
+		var scrollHint string
 		if off > 0 {
-			scrollHint = "i  chat   j  ↓bottom   k  ↑more   c  copy"
+			scrollHint = kh("t", "alk") + "  " + kh("c", "opy") + "  " + kh("j", "↓ ") + kh("k", "↑")
+		} else {
+			scrollHint = kh("t", "alk") + "  " + kh("c", "opy") + "  " + kh("j", "/") + kh("k", " scroll")
 		}
-		foot = append(foot, hintStyle.Render(scrollHint))
+		foot = append(foot, scrollHint)
 		foot = append(foot, "")
 	}
 
 	return
+}
+
+func kh(key, suffix string) string {
+	return petStyle.Render(key) + hintStyle.Render(suffix)
 }
 
 func statBar(icon, label string, val int) string {
