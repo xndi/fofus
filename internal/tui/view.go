@@ -25,7 +25,6 @@ var (
 	youStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 	petStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	actionStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Italic(true)
-	tsStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("238"))
 	inputStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 	hintStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("237"))
@@ -110,7 +109,7 @@ func (m Model) buildLeftParts() (top []string, foot []string) {
 
 	foot = []string{
 		dimStyle.Render(strings.Repeat("─", leftWidth)),
-		kh("t", "alk") + "  " + kh("f", "eed") + "  " + kh("p", "lay") + "  " + kh("q", "uit"),
+		hintStyle.Render("t") + kh("a", "lk") + "  " + kh("f", "eed") + "  " + kh("p", "lay") + "  " + kh("q", "uit"),
 		"",
 	}
 	return
@@ -134,39 +133,29 @@ func (m Model) bubbleLines() []string {
 // top = scroll(1) + chatRows(12) + thinking(1) = 14 lines
 // foot = divider(1) + input(1) + hint(1) = 3 lines
 func (m Model) buildRightParts() (top []string, foot []string) {
-	chatLineWidth := rightWidth - 8
+	chatLineWidth := rightWidth - 1
 
 	type row struct{ s string }
 	var allRows []row
 
 	for _, line := range m.chatLog {
-		ts := tsStyle.Render(line.at.Format("15:04") + "  ")
-		cont := "       "
 		switch line.from {
 		case "you":
 			label := rainbowLabel("you: ", youPalette)
-			for i, l := range wordWrap(line.text, chatLineWidth-len("you: ")) {
-				pfx := ts
-				if i > 0 {
-					pfx = cont
-					allRows = append(allRows, row{pfx + youStyle.Render(l)})
-				} else {
-					allRows = append(allRows, row{pfx + label + youStyle.Render(l)})
-				}
+			first, rest := wrapFirstRest(line.text, chatLineWidth-len("you: "), chatLineWidth)
+			allRows = append(allRows, row{label + youStyle.Render(first)})
+			for _, l := range rest {
+				allRows = append(allRows, row{youStyle.Render(l)})
 			}
 		case "fofus":
 			label := rainbowLabel("fofus: ", petPalette)
-			for i, l := range wordWrap(line.text, chatLineWidth-len("fofus: ")) {
-				pfx := ts
-				if i > 0 {
-					pfx = cont
-					allRows = append(allRows, row{pfx + renderWithActions(l, petStyle)})
-				} else {
-					allRows = append(allRows, row{pfx + label + renderWithActions(l, petStyle)})
-				}
+			first, rest := wrapFirstRest(line.text, chatLineWidth-len("fofus: "), chatLineWidth)
+			allRows = append(allRows, row{label + renderWithActions(first, petStyle)})
+			for _, l := range rest {
+				allRows = append(allRows, row{renderWithActions(l, petStyle)})
 			}
 		case "err":
-			allRows = append(allRows, row{ts + errStyle.Render("! " + line.text)})
+			allRows = append(allRows, row{errStyle.Render("! " + line.text)})
 		}
 	}
 
@@ -295,6 +284,16 @@ func speechBubble(text string) []string {
 	result = append(result, chatStyle.Render("╰──╮"+strings.Repeat("─", maxLen-2)+"╯"))
 	result = append(result, chatStyle.Render("   │"))
 	return result
+}
+
+// wrapFirstRest wraps the first line at firstWidth and remaining text at restWidth.
+func wrapFirstRest(text string, firstWidth, restWidth int) (first string, rest []string) {
+	lines := wordWrap(text, firstWidth)
+	first = lines[0]
+	if len(lines) > 1 {
+		rest = wordWrap(strings.Join(lines[1:], " "), restWidth)
+	}
+	return
 }
 
 // wordWrap splits text into lines of at most maxWidth visible characters,
