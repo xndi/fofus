@@ -26,11 +26,16 @@ var (
 	petStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	actionStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Italic(true)
 	tsStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("238"))
-	inputStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("220"))
+	inputStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 	hintStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("237"))
 	errStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 
+	youPalette = []string{"196", "198", "201", "135", "99", "63"}
+	petPalette = []string{"82", "84", "87", "93", "99", "135"}
+)
+
+var (
 	padL = lipgloss.NewStyle().Width(leftWidth)
 	padR = lipgloss.NewStyle().Width(rightWidth)
 
@@ -105,7 +110,7 @@ func (m Model) buildLeftParts() (top []string, foot []string) {
 
 	foot = []string{
 		dimStyle.Render(strings.Repeat("─", leftWidth)),
-		kh("f", "eed") + "  " + kh("p", "lay") + "  " + kh("t", "alk") + "  " + kh("q", "uit"),
+		kh("t", "alk") + "  " + kh("f", "eed") + "  " + kh("p", "lay") + "  " + kh("q", "uit"),
 		"",
 	}
 	return
@@ -139,20 +144,26 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 		cont := "       "
 		switch line.from {
 		case "you":
-			for i, l := range wordWrap("you: "+line.text, chatLineWidth) {
+			label := rainbowLabel("you: ", youPalette)
+			for i, l := range wordWrap(line.text, chatLineWidth-len("you: ")) {
 				pfx := ts
 				if i > 0 {
 					pfx = cont
+					allRows = append(allRows, row{pfx + youStyle.Render(l)})
+				} else {
+					allRows = append(allRows, row{pfx + label + youStyle.Render(l)})
 				}
-				allRows = append(allRows, row{pfx + youStyle.Render(l)})
 			}
 		case "fofus":
-			for i, l := range wordWrap("fofus: "+line.text, chatLineWidth) {
+			label := rainbowLabel("fofus: ", petPalette)
+			for i, l := range wordWrap(line.text, chatLineWidth-len("fofus: ")) {
 				pfx := ts
 				if i > 0 {
 					pfx = cont
+					allRows = append(allRows, row{pfx + renderWithActions(l, petStyle)})
+				} else {
+					allRows = append(allRows, row{pfx + label + renderWithActions(l, petStyle)})
 				}
-				allRows = append(allRows, row{pfx + renderWithActions(l, petStyle)})
 			}
 		case "err":
 			allRows = append(allRows, row{ts + errStyle.Render("! " + line.text)})
@@ -201,7 +212,11 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 
 	foot = append(foot, dimStyle.Render(strings.Repeat("─", rightWidth)))
 	if m.chatMode {
-		foot = append(foot, inputStyle.Render("> "+m.input+"█"))
+		inp := m.input
+		if maxVis := rightWidth - 3; len(inp) > maxVis {
+			inp = inp[len(inp)-maxVis:]
+		}
+		foot = append(foot, inputStyle.Render("> "+inp+"█"))
 		foot = append(foot, hintStyle.Render("/smart  smarter reply · esc  cancel"))
 	} else {
 		var scrollHint string
@@ -215,6 +230,14 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 	}
 
 	return
+}
+
+func rainbowLabel(text string, palette []string) string {
+	var sb strings.Builder
+	for i, ch := range text {
+		sb.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(palette[i%len(palette)])).Render(string(ch)))
+	}
+	return sb.String()
 }
 
 func kh(key, suffix string) string {
