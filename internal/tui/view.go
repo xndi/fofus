@@ -17,13 +17,13 @@ const (
 )
 
 var (
-	titleStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205"))
+	titleStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("82"))
 	statStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
-	barFill     = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	barFill     = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	barEmpty    = lipgloss.NewStyle().Foreground(lipgloss.Color("237"))
 	chatStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
 	youStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("39"))
-	petStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	petStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 	actionStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Italic(true)
 	tsStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("238"))
 	inputStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("220"))
@@ -206,9 +206,9 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 	} else {
 		var scrollHint string
 		if off > 0 {
-			scrollHint = kh("t", "alk") + "  " + kh("c", "opy") + "  " + kh("j", "↓ ") + kh("k", "↑")
+			scrollHint = kh("j", "↓ ") + kh("k", "↑") + "  " + kh("c", "opy")
 		} else {
-			scrollHint = kh("t", "alk") + "  " + kh("c", "opy") + "  " + kh("j", "/") + kh("k", " scroll")
+			scrollHint = kh("j", "/") + kh("k", " scroll") + "  " + kh("c", "opy")
 		}
 		foot = append(foot, scrollHint)
 		foot = append(foot, "")
