@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	leftWidth      = 26
-	rightWidth     = 36
-	chatRows       = 12
-	bubbleInner    = 22
-	bubbleReserved = 6 // always this many lines for the bubble area
+	leftWidth      = 29
+	rightWidth     = 40
+	chatRows       = 13
+	bubbleInner    = 24
+	bubbleReserved = 7 // always this many lines for the bubble area
 )
 
 var (
@@ -204,9 +204,9 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 		foot = append(foot, inputStyle.Render("> "+m.input+"█"))
 		foot = append(foot, hintStyle.Render("/smart  smarter reply · esc  cancel"))
 	} else {
-		scrollHint := "i  chat   j/k  scroll"
+		scrollHint := "i  chat   j/k  scroll   c  copy"
 		if off > 0 {
-			scrollHint = "i  chat   j  ↓bottom   k  ↑more"
+			scrollHint = "i  chat   j  ↓bottom   k  ↑more   c  copy"
 		}
 		foot = append(foot, hintStyle.Render(scrollHint))
 		foot = append(foot, "")

@@ -1,6 +1,9 @@
 package tui
 
 import (
+	"fmt"
+	"os/exec"
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -81,6 +84,8 @@ func (m Model) handleNav(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if m.scrollOffset > 0 {
 			m.scrollOffset--
 		}
+	case "c":
+		return m, copyChatCmd(m.chatLog)
 	}
 	return m, nil
 }
@@ -122,6 +127,19 @@ func (m Model) handleChatInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	}
 	return m, nil
+}
+
+func copyChatCmd(log []chatLine) tea.Cmd {
+	return func() tea.Msg {
+		var sb strings.Builder
+		for _, line := range log {
+			sb.WriteString(fmt.Sprintf("[%s] %s: %s\n", line.at.Format("15:04"), line.from, line.text))
+		}
+		cmd := exec.Command("pbcopy")
+		cmd.Stdin = strings.NewReader(sb.String())
+		_ = cmd.Run()
+		return nil
+	}
 }
 
 func idleQuipCmd(cfg config.Config) tea.Cmd {
