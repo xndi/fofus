@@ -210,9 +210,9 @@ func (m Model) buildRightParts() (top []string, foot []string) {
 	} else {
 		var scrollHint string
 		if off > 0 {
-			scrollHint = kh("j", "↓ ") + kh("k", "↑") + "  " + kh("c", "opy")
+			scrollHint = kh("j", "↓ ") + kh("k", "↑") + "  " + kh("c", "opy") + "  " + kh("r", "eport")
 		} else {
-			scrollHint = kh("j", "/") + kh("k", " scroll") + "  " + kh("c", "opy")
+			scrollHint = kh("j", "/") + kh("k", " scroll") + "  " + kh("c", "opy") + "  " + kh("r", "eport")
 		}
 		foot = append(foot, scrollHint)
 		foot = append(foot, "")
@@ -267,8 +267,8 @@ func speechBubble(text string) []string {
 	}
 	maxLen := 0
 	for _, l := range lines {
-		if len(l) > maxLen {
-			maxLen = len(l)
+		if w := len([]rune(l)); w > maxLen {
+			maxLen = w
 		}
 	}
 	if maxLen < 2 {
@@ -278,10 +278,10 @@ func speechBubble(text string) []string {
 	var result []string
 	result = append(result, chatStyle.Render("╭"+strings.Repeat("─", maxLen+2)+"╮"))
 	for _, l := range lines {
-		pad := strings.Repeat(" ", maxLen-len(l))
+		pad := strings.Repeat(" ", maxLen-len([]rune(l)))
 		result = append(result, chatStyle.Render("│ "+l+pad+" │"))
 	}
-	result = append(result, chatStyle.Render("╰──╮"+strings.Repeat("─", maxLen-2)+"╯"))
+	result = append(result, chatStyle.Render("╰──╮"+strings.Repeat("─", maxLen-1)+"╯"))
 	result = append(result, chatStyle.Render("   │"))
 	return result
 }
@@ -299,21 +299,23 @@ func wrapFirstRest(text string, firstWidth, restWidth int) (first string, rest [
 // wordWrap splits text into lines of at most maxWidth visible characters,
 // hard-breaking words longer than maxWidth.
 func wordWrap(text string, maxWidth int) []string {
+	rw := func(s string) int { return len([]rune(s)) }
 	var lines []string
 	words := strings.Fields(text)
 	current := ""
 	for _, w := range words {
-		for len(w) > maxWidth {
+		for rw(w) > maxWidth {
 			if current != "" {
 				lines = append(lines, current)
 				current = ""
 			}
-			lines = append(lines, w[:maxWidth])
-			w = w[maxWidth:]
+			runes := []rune(w)
+			lines = append(lines, string(runes[:maxWidth]))
+			w = string(runes[maxWidth:])
 		}
 		if current == "" {
 			current = w
-		} else if len(current)+1+len(w) <= maxWidth {
+		} else if rw(current)+1+rw(w) <= maxWidth {
 			current += " " + w
 		} else {
 			lines = append(lines, current)
